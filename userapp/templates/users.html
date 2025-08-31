@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Info</title>
+</head>
+<body>
+    <h1>User Info</h1>
+
+    <!-- Form to add a new user -->
+    <form id="userForm">
+        <input type="text" id="fullname" placeholder="Full Name" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="number" id="age" placeholder="Age" required>
+        <button type="submit">Add User</button>
+    </form>
+
+    <hr>
+
+    <!-- Display all users -->
+    <h2>All Users</h2>
+    <ul id="userList"></ul>
+
+    <script>
+        const apiBase = "http://127.0.0.1:8000/api/users/";
+
+        // Fetch and display all users
+        async function loadUsers() {
+            let response = await fetch(apiBase);
+            let data = await response.json();
+            let list = document.getElementById("userList");
+            list.innerHTML = "";
+            data.forEach(user => {
+                let li = document.createElement("li");
+                li.innerText = `${user.fullname} (${user.email}) - Age: ${user.age}`;
+                list.appendChild(li);
+            });
+        }
+
+        // Handle form submit (POST new user)
+        document.getElementById("userForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            let fullname = document.getElementById("fullname").value;
+            let email = document.getElementById("email").value;
+            let age = document.getElementById("age").value;
+
+            await fetch(apiBase, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ fullname, email, age })
+            });
+
+            loadUsers();  // reload users
+        });
+
+        // Load users when page opens
+        loadUsers();
+    </script>
+</body>
+</html>
